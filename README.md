@@ -41,9 +41,25 @@ awk -F ',' '{if($7='2012') arr[$1]+=$10} END { for(x in arr){print x} }' WA_Sale
 ```
    - Pada bagian `awk -F ','` Data dipisahkan menggunaka `-F` untuk setiap ada tanda `,`
    - Pada bagian `{if($7='2012')`, Data yang diambil hanya data tahun 2012
-   - Pada bagian `arr[$1]+=$10}`, menghubungkan setiap negara dengan masing-masing penjualannya
+   - Pada bagian `arr[$1]+=$10}`, menghubungkan setiap negara dengan masing-masing penjualannya (kolom ke-10)
    - Pada bagian `{ for(x in arr){print x} }`, dijalankan looping untuk menampilkan nama-nama negara
    - Lalu, hasilnya disort menggunakan `sort -n -r` secara numerikal (`-n`), lalu karena sort-nya dari kecil ke besar, sort-nya di-reverse menggunakan `-r`
    - Yang disort adalah penjualan masing-masing negara, namun yang ditampilkan hanya nama negaranya karena yang diprint adalah variabel `x`, bukan `arr[x]` (hasil penjualannya)
    - `head -1` untuk menampilkan hanya 1 baris teratas
    - `> soal2a.txt` ini untuk menyimpan hasilnya ke sebuah file bernama soal2a.txt
+
+2b. - Berikut adalah isi scriptnya
+```
+#!/bin/bash
+
+res=$(cat soal2a.txt)
+
+awk -F "," '{if($1=$res && $7=="2012") arr[$4]+=$10} END {for(i in arr)print i}' WA_Sales_Products_2012-14.csv | sort -n -r | head -3 > soal2b.txt
+```
+  - Dengan menggunakan file output dari soal a, kita masukkan ke variabel `res`, untuk menjadi syarat pencarian
+  - Tambahkan juga `$7=="2012"` untuk mengambil hasil United States yang tahun 2012 saja
+  - `arr[$4]+=$10` Menggabungkan hasil penjualan dengan kolom product line (kolom ke-4)
+  - `{for(i in arr)print i}` Loop untuk menampilkan product linenya saja
+  - `sort -n -r` Sort secara numerical dan terbalik supaya jadi besar ke kecil
+  - `head -3 > soal2b.txt` Hanya menampilkan 3 teratas dan menyimpannya dalam file output `soal2b.txt`
+
