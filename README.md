@@ -63,6 +63,21 @@ awk -F "," '{if($1=$res && $7=="2012") arr[$4]+=$10} END {for(i in arr)print i}'
   - `sort -n -r` Sort secara numerical dan terbalik supaya jadi besar ke kecil
   - `head -3 > soal2b.txt` Hanya menampilkan 3 teratas dan menyimpannya dalam file output `soal2b.txt`
 
+2c. - Berikut adalah isi scriptnya
+```
+#!/bin/bash
+
+res1=$(cat soal2a.txt)
+res2=$(cat soal2b.txt)
+
+awk -F ',' '{if($1 -eq $res1  && $6 -eq $res2 && $7=="2012") arr[$6]+=$10} END { for(i in arr){print i" "arr[i]} }' WA_Sales_Products_2012-14.csv | sort -n -r | head -3
+```
+   - Hasil nomor a dan b disimpan pada variabel `res1` dan `res2`
+   - `if($1 -eq $res1  && $6 -eq $res2 && $7=="2012")` If ini untuk menyeleksi hasil dari negara yang cocok dengan `$res1`, product line yang cocok dengan `$res2`, dan tahun yang cocok dengan `2012`
+   - Lalu gabungkan kolom penjualan ($10) dengan kolom produk ($6) pada `arr[$6]+=$10`
+   - `{ for(i in arr){print i" "arr[i]}` Untuk menampilkan produk-produk `i` beserta penjualannya `arr[i]`
+   - Seperti nomor sebelumnya hasil di-sort dan ditampilkan 3 teratas dengan `sort -n -r | head -3`, namun tidak disimpan ke-file karena sudah habis nomornya
+   
 3. - Mirip soal nomor 1, dibuat 1 variabel bernilai 1 bernama `no` untuk nama pembedaan nama file
 ```
 no=1
