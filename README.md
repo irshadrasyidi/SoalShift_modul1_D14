@@ -32,3 +32,18 @@ done
    - 14 ketiga: Tanggal 14
    - 2: Bulan ke-2 (Februari)
    - 5: Hari ke-5 (Jumat)
+   
+2a. - Berikut adalah isi scriptnya
+```
+#!/bin/bash
+
+awk -F ',' '{if($7='2012') arr[$1]+=$10} END { for(x in arr){print x} }' WA_Sales_Products_2012-14.csv | sort -n -r | head -1 > soal2a.txt
+```
+   - Pada bagian `awk -F ','` Data dipisahkan menggunaka `-F` untuk setiap ada tanda `,`
+   - Pada bagian `{if($7='2012')`, Data yang diambil hanya data tahun 2012
+   - Pada bagian `arr[$1]+=$10}`, menghubungkan setiap negara dengan masing-masing penjualannya
+   - Pada bagian `{ for(x in arr){print x} }`, dijalankan looping untuk menampilkan nama-nama negara
+   - Lalu, hasilnya disort menggunakan `sort -n -r` secara numerikal (`-n`), lalu karena sort-nya dari kecil ke besar, sort-nya di-reverse menggunakan `-r`
+   - Yang disort adalah penjualan masing-masing negara, namun yang ditampilkan hanya nama negaranya karena yang diprint adalah variabel `x`, bukan `arr[x]` (hasil penjualannya)
+   - `head -1` untuk menampilkan hanya 1 baris teratas
+   - `> soal2a.txt` ini untuk menyimpan hasilnya ke sebuah file bernama soal2a.txt
