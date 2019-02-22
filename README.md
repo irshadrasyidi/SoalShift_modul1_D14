@@ -63,3 +63,20 @@ awk -F "," '{if($1=$res && $7=="2012") arr[$4]+=$10} END {for(i in arr)print i}'
   - `sort -n -r` Sort secara numerical dan terbalik supaya jadi besar ke kecil
   - `head -3 > soal2b.txt` Hanya menampilkan 3 teratas dan menyimpannya dalam file output `soal2b.txt`
 
+3. - Mirip soal nomor 1, dibuat 1 variabel bernilai 1 bernama `no` untuk nama pembedaan nama file
+```
+no=1
+```
+   - Untuk mengecek apakah nama file sudah ada atau belum, maka dibuat loop seperti ini
+```
+while test -e "pword$no.txt";
+do
+ ((no++))
+done
+```
+   - Jika hasil ditemukan ada file dengan `$no` sama, maka variabel no di-increment
+   - `/dev/urandom tr` Untuk membuat passwordnya
+   - `A-Za-z0-9` Supaya password bisa terdiri dari A-Z, a-z, atau 0-9
+   - `head -c 12` Supaya password yang dibuat hanya terdiri dari 12 karakter
+   - `password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c 12)` hasilnya disimpan di variabel `password`
+   - `echo "$password" > "$file"` Variabel tadi disimpan di $file, `file="pword$no.txt"` yang merupakan sebuah .txt file dengan sisipan `$no` untuk membedakan nama filenya
