@@ -1,1 +1,9 @@
-14 14 14 2 5 /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no1/soal1.sh
+#no1
+14 14 14 2 * /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no1/soal1.sh
+0 0 * 2 5 /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no1/soal1.sh
+
+#no5
+2-30/6 * * * * /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no5/soal5.sh
+
+#no4
+0 */1 * * * /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no4/soal4.sh
