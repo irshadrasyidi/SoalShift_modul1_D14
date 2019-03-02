@@ -26,12 +26,18 @@ done
    - Hasil file output dimasukkan ke folder `/decrypted/`
    - Di bagian akhir, increment-kan variabel tadi, sehingga file berikutnya yang didecode memiliki nama yang berbeda
    - Lalu, tambahkan crontab supaya bisa bekerja pukul 14:14 pada tanggal 14 Februari atau hari tersebut adalah hari jumat
-> 14 14 14 2 5 /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no1/soal1.sh
+> 14 14 14 2 * /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no1/soal1.sh
    - 14 pertama: Menit 14
    - 14 kedua: Jam 14
    - 14 ketiga: Tanggal 14
    - 2: Bulan ke-2 (Februari)
-   - 5: Hari ke-5 (Jumat)
+   - (bintang): Hari apapun
+> 0 0 * 2 5 /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no1/soal1.sh
+   - 0: Menit ke 0
+   - 0: Jam ke 0
+   - (bintang): tanggal berapa saja
+   - 2: Bulan Februari
+   - 5: Hari Jumat
    
 2a. - Berikut adalah isi scriptnya
 ```
@@ -67,16 +73,14 @@ awk -F "," '{if($1=$res && $7=="2012") arr[$4]+=$10} END {for(i in arr)print i}'
 ```
 #!/bin/bash
 
-res1=$(cat soal2a.txt)
-res2=$(cat soal2b.txt)
-
-awk -F ',' '{if($1 -eq $res1  && $6 -eq $res2 && $7=="2012") arr[$6]+=$10} END { for(i in arr){print i" "arr[i]} }' WA_Sales_Products_2012-14.csv | sort -n -r | head -3
+awk -F ',' '{if($7 == "2012" && $1 == "United States" && ($4 == "Personal Accessories" || $4 == "Camping Equipment" || $4 == "Outdoor Protection")) arr[$6]+=$10} END { for(i in arr){print arr[i]","i} }' WA_Sales_Products_2012-14.csv | sort -n -r | awk -F ',' '{print $2}' | head -3
 ```
-   - Hasil nomor a dan b disimpan pada variabel `res1` dan `res2`
-   - `if($1 -eq $res1  && $6 -eq $res2 && $7=="2012")` If ini untuk menyeleksi hasil dari negara yang cocok dengan `$res1`, product line yang cocok dengan `$res2`, dan tahun yang cocok dengan `2012`
+   - Hasil nomor a dan b adalah "United States" dan 3 Product Line ("Personal Accessories", "Camping Equipment", "Outdoor Protection"), dijadikan syarat/filter untuk mencari produk-produk jawaban 2c
+   - `if($7 == "2012" && $1 == "United States" && ($4 == "Personal Accessories" || $4 == "Camping Equipment" || $4 == "Outdoor Protection"))` If ini untuk menyeleksi hasil dari negara yang cocok dengan `United States`, product line yang cocok dengan `Personal Accessories` atau `Camping Equipment` atau `Outdoor Protection`, dan tahun yang cocok dengan `2012`
    - Lalu gabungkan kolom penjualan ($10) dengan kolom produk ($6) pada `arr[$6]+=$10`
-   - `{ for(i in arr){print i" "arr[i]}` Untuk menampilkan produk-produk `i` beserta penjualannya `arr[i]`
-   - Seperti nomor sebelumnya hasil di-sort dan ditampilkan 3 teratas dengan `sort -n -r | head -3`, namun tidak disimpan ke-file karena sudah habis nomornya
+   - `{ for(i in arr){print arr[i]","i} }` Untuk menampilkan quantity penjualannya `arr[i]` beserta produk-produk `i`
+   - Seperti nomor sebelumnya hasil di-sort besar ke kecil `sort -n -r`
+   - Lalu, karena yang ditampilkan hanya nama produknya saja (tanpa quantity) dan 3 teratas, maka digunakan awk lagi dengan delimiter ',' `awk -F ','` lalu diambil argumen ke 2, yaitu produknya `{print $2}`, lalu di-pipe dan tampilkan 3 teratas `head -3`
    
 3. - Mirip soal nomor 1, dibuat 1 variabel bernilai 1 bernama `no` untuk nama pembedaan nama file
 ```
@@ -97,5 +101,5 @@ done
    - `echo "$password" > "$file"` Variabel tadi disimpan di $file, `file="pword$no.txt"` yang merupakan sebuah .txt file dengan sisipan `$no` untuk membedakan nama filenya
 
 no 4 & 5 tidak selesai
-4: Tidak paham dengan enkripsi konversi huruf (string manipulation)(??)
+4. 
 5: Belum dicoba karena kehabisan waktu untuk mencoba (habis di nomor 4)
