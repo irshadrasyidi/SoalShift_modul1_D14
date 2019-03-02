@@ -100,6 +100,83 @@ done
    - `password=$(</dev/urandom tr -dc A-Za-z0-9 | head -c 12)` hasilnya disimpan di variabel `password`
    - `echo "$password" > "$file"` Variabel tadi disimpan di $file, `file="pword$no.txt"` yang merupakan sebuah .txt file dengan sisipan `$no` untuk membedakan nama filenya
 
-no 4 & 5 tidak selesai
-4. 
-5: Belum dicoba karena kehabisan waktu untuk mencoba (habis di nomor 4)
+4. - Buat variabel string berisi alfabet, sebagai alat untuk membantu enkripsi, dan dibuat menjadi 2 set alfabet supaya huruf-huruf yang hasil enkripsinya melebihi 'z', akan kembali ke 'a'
+```
+kecil=abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
+besar=ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ
+```
+   - Karena basis enkripsi menggunakan jam, maka buat variabel kunci (x) yang mengambil waktu jam dari fungsi date milik linux `x=$(date +"%H")`
+   - Input syslog disimpan di variabel 'input' `input="/var/log/syslog"`
+   - Format jam adalah 24, jadi jam '9' akan tertampilkan '09'. Hal ini dapat diantisipasi dengan pengecek IF berikut
+```
+if [ ${x:0:1} == 0 ]
+then
+ x=${x:1:1}
+fi
+```
+   - Jika 1 karakter index ke-0 dari variabel x adalah 0 `{x:0:1}`, maka x di-assign-kan karakter index ke-1 sejumlah 1 karakter `x=${x:1:1}`, dengan begini semisal '09', maka diambil bilangan ke duanya saja, jadi '9'
+   - Lalu, buat variabel untuk menyimpan nama file yang akan dibuat `backupfile=$(date +"%H:%M %d-%m-%Y")`, perhatikan formatnya sesuai dengan soal, dan langsung diambil juga dengan fungsi date dari linux
+   - Sama seperti kendala '0' pada jam, maka string `backupfile` juga dicek menggunakan IF berikut
+```
+if [ ${backupfile:0:1} == 0 ]
+then
+ backupfile=${backupfile:1}
+fi
+```
+   - Lalu, ambil isi dari input, yang merupakan isi syslog `cat $input`
+   - Menggunakan fungsi tr (truncate) untuk mengubah string
+```
+tr [${kecil:26}${besar:26}] [${kecil:$x:26}${besar:$x:26}]
+```
+   - `[${kecil:26}${besar:26}]`, bagian ini mengambil isi inputan yang karakternya termasuk dalam variabel kecil dan besar, yaitu semua alfabet kapital maupun tidak
+   - `[${kecil:$x:26}${besar:$x:26}]`, bagian ini merupakan target perubahannya, digunakan `$x` karena itu adalah basis kunci dari proses enkripsinya
+   - Untuk Dekripsi, mula-mula siapkan variabel alfabetnya kembali
+```
+kecil=abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
+besar=ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ
+```
+   - buat varibel yang mengambil nama file yang ingin didekrip `input="11:13 02-03-2019"`, karena basis kuncinya terdapat pada jam, maka bagian yang menunjukkan jam disimpan di suatu variabel `x=${input:0:2}`
+   - Lanjutan dari kendala format jam 24, jika jam-nya dibawah jam 10 (misal jam 6), maka karakter yang terambil adalah '6:' bukan '6', maka dibuatkan IF untuk mengambil hanya angka '6'-nya saja
+```
+if [[ ${x:0:1} =~ [0-9] ]] && [ ${x:1:1} == ":" ]
+then
+ x=${x:0:1}
+fi
+```
+   - `${x:0:1} =~ [0-9]`, mengecek karakter pertama adalah angka
+   - `[ ${x:1:1} == ":" ]`, mengecek karakter kedua adalah ':'
+   - `x=${x:0:1}`, x di-assign-kan 1 karakter pertama saja
+   - Ambil inputan dengan awk berikut
+```
+awk '{print}' "/home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no4/$input"
+```
+   - Lalu, di-pipe dan masukkan ke proses truncate
+```
+tr "${kecil:$x:26}${besar:$x:26}" "${kecil:0:26}${besar:0:26}" > "/home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no4/decrypted/$input"
+```
+   - karena didekrip, maka posisi opsi tr-nya ditukar, dan basis-nya direset di opsi target `${kecil:0:26}${besar:0:26}`
+   - Lalu simpan filenya `> "/home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no4/decrypted/$input"`
+   - Lalu pasang crontab-nya
+```
+#no4
+0 */1 * * * /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no4/soal4.sh
+```
+   - 0: menit ke-0
+   - (bintang)/1: Untuk setiap 1 jam di jam berapapun
+   - (3 bintang sisanya): tanggal, bulan, dan hari kapanpun
+   
+5. - Berikut awk-nya
+```
+awk '(/CRON/ || /cron/),!/sudo/' /var/log/syslog | awk 'NF < 13' >> /home/irshadrasyidi/modul1/no5.txt
+```
+   - Mengambil dari syslog, yang mengandung pattern CRON atau cron (karena case insensitive) `(/CRON/ || /cron/)`
+   - Juga harus tidak mengandung pattern sudo `!/sudo/`
+   - Yang diminta adalah yang Number of Field-nya (NF) kurang dari 13 `awk 'NF < 13'`
+   - Lalu simpan di direktori yang diminta `>> /home/irshadrasyidi/modul1/no5.txt`
+   - Pasang juga crontab-nya
+```
+#no5
+2-30/6 * * * * /home/irshadrasyidi/Documents/SISOP/MODUL1/SOALSHIFT/no5/soal5.sh
+```
+   - 2-30/6: Pada menit 2 hingga menit 30, dijalankan setiap 6 menit
+   - (4 bintang): Jam, Tanggal, Bulan, dan hari terserah
